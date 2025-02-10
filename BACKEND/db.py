@@ -5,5 +5,5 @@ def get_db_connection():
             host="cis2368spring.cvucss6moz7l.us-east-2.rds.amazonaws.com",
             user="Srazavi4",
             password="Butterfly@58",
-            database="cis2368spring"
+            database="CIS2368SPRINGDB"
     )
