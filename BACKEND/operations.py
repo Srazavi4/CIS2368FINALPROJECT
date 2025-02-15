@@ -96,3 +96,52 @@ def delete_customer(id):
     connection.commit()
     cursor.close()
     connection.close()
+
+# Borrowing functions
+# Viewing borrowings function
+def get_all_borrowings():
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM borrowingrecords")
+    borrowings = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return borrowings
+
+# Borrowing book function
+def borrow_book(book_id, customer_id, borrow_date):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute(
+        "INSERT INTO borrowingrecords (bookid, customerid, borrowdate) VALUES (%s, %s, %s)",
+        (book_id, customer_id, borrow_date)
+    )
+    cursor.execute("UPDATE books SET status = 'unavailable' WHERE id = %s", (book_id,))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+# Returning book function
+def return_book(borrowing_id, return_date):
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM borrowingrecords WHERE id = %s", (borrowing_id,))
+    borrowing = cursor.fetchone()
+    if not borrowing:
+        cursor.close()
+        connection.close()
+        return False
+
+    # Calculates late fee
+    late_fee = calculate_late_fee(borrowing['borrowdate'], return_date)
+
+    # Updates borrowing record
+    cursor.execute(
+        "UPDATE borrowingrecords SET returndate = %s, late_fee = %s WHERE id = %s",
+        (return_date, late_fee, borrowing_id)
+    )
+    cursor.execute("UPDATE books SET status = 'available' WHERE id = %s", (borrowing['bookid'],))
+    connection.commit()
+    cursor.close()
+    connection.close()
+    return True
