@@ -1,5 +1,7 @@
 from datetime import datetime
 import db
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 # Function to calculate late fee
 def calculate_late_fee(borrowdate, returndate):
@@ -66,11 +68,12 @@ def get_all_customers():
 
 # Add customer function
 def add_customer(firstname, lastname, email, passwordhash):
+    hashed_password = generate_password_hash(passwordhash, method='sha256')
     connection = db.get_db_connection()
     cursor = connection.cursor()
     cursor.execute(
         "INSERT INTO customers (firstname, lastname, email, passwordhash) VALUES (%s, %s, %s, %s)",
-        (firstname, lastname, email, passwordhash)
+        (firstname, lastname, email, hashed_password)
     )
     connection.commit()
     cursor.close()
@@ -78,11 +81,12 @@ def add_customer(firstname, lastname, email, passwordhash):
 
 # Update customer function
 def update_customer(id, firstname, lastname, email, passwordhash):
+    hashed_password = generate_password_hash(passwordhash, method='sha256')
     connection = db.get_db_connection()
     cursor = connection.cursor()
     cursor.execute(
         "UPDATE customers SET firstname = %s, lastname = %s, email = %s, passwordhash = %s WHERE id = %s",
-        (firstname, lastname, email, passwordhash, id)
+        (firstname, lastname, email, hashed_password, id)
     )
     connection.commit()
     cursor.close()
@@ -96,6 +100,19 @@ def delete_customer(id):
     connection.commit()
     cursor.close()
     connection.close()
+
+# Verify customer login
+def verify_customer(email, password):
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers WHERE email = %s", (email,))
+    customer = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    if customer and check_password_hash(customer['passwordhash'], password):
+        return True
+    return False
 
 # Borrowing functions
 # Viewing borrowings function
