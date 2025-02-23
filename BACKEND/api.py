@@ -16,7 +16,7 @@ def get_books():
 def add_book_route():
     data = request.json
     add_book(data['title'], data['author'], data['genre'])
-    return jsonify({'message': 'Book added successfully!'}), 201
+    return jsonify({'message': 'Book added successfully!'})
 
 @app.route('/books/<int:id>', methods=['PUT']) #Updated books
 def update_book_route(id):
@@ -39,7 +39,7 @@ def get_customers():
 def add_customer_route():
     data = request.json
     add_customer(data['firstname'], data['lastname'], data['email'], data['passwordhash'])
-    return jsonify({'message': 'Customer added successfully!'}),
+    return jsonify({'message': 'Customer added successfully!'})
 
 @app.route('/customers/<int:id>', methods=['PUT']) #Updated customers
 def update_customer_route(id):
@@ -53,7 +53,24 @@ def delete_customer_route(id):
     return jsonify({'message': 'Customer deleted successfully!'})
 
 # API for Borrowing
+@app.route('/borrow', methods=['POST']) #Borrows books
+def borrow_book_route():
+    data = request.json
+    borrow_book(data['bookid'], data['customerid'], datetime.strptime(data['borrowdate'], '%Y-%m-%d').date())
+    return jsonify({'message': 'Book borrowed successfully!'})
 
+@app.route('/return', methods=['POST']) #Returns books
+def return_book_route():
+    data = request.json
+    if return_book(data['id'], datetime.strptime(data['returndate'], '%Y-%m-%d').date()):
+        return jsonify({'message': 'Book returned successfully!'})
+    else:
+        return jsonify({'message': 'Borrowing record not found!'})
+
+@app.route('/borrowings', methods=['GET']) #Shows all borrowing records
+def get_borrowings():
+    borrowings = get_all_borrowings()
+    return jsonify(borrowings)
 
 if __name__ == '__main__':
     app.run(debug=True)
