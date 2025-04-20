@@ -119,7 +119,20 @@ def verify_customer(email, password):
 def get_all_borrowings():
     connection = db.get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM borrowingrecords")
+
+    cursor.execute("""
+    SELECT 
+        br.id,
+        b.title AS book_title,
+        CONCAT(c.firstname, ' ', c.lastname) AS customer_name,
+        br.borrowdate,
+        br.returndate,
+        br.late_fee
+    FROM borrowingrecords br
+    JOIN books b ON br.bookid = b.id
+    JOIN customers c ON br.customerid = c.id
+    """)
+
     borrowings = cursor.fetchall()
     cursor.close()
     connection.close()
