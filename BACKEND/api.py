@@ -3,8 +3,10 @@ from flask import request
 from flask import jsonify
 from datetime import datetime
 from operations import *
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # API for Books
 @app.route('/books', methods=['GET']) #Shows all books
