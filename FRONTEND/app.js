@@ -8,6 +8,7 @@ app.use(express.static('public'));
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+// route for the main page
 app.get('/', (req, res) => {
     res.render('index');
 });

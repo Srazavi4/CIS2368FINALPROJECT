@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     loadCustomers();
 
+    // handles adding a customer
     document.getElementById('customer-form').addEventListener('submit', async function (e) {
         e.preventDefault();
         const firstname = document.getElementById('customer-firstname').value;
@@ -8,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const email = document.getElementById('customer-email').value;
         const password = document.getElementById('customer-password').value;
 
+        // post request to add new customer
         await axios.post('http://localhost:5000/customers', {
             firstname,
             lastname,
@@ -20,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// loads all customers
 async function loadCustomers() {
     const res = await axios.get('http://localhost:5000/customers');
     const customers = res.data;
@@ -36,6 +39,7 @@ async function loadCustomers() {
     });
 }
 
+// deletes a customer
 async function deleteCustomer(id) {
     await axios.delete(`http://localhost:5000/customers/${id}`);
     loadCustomers();

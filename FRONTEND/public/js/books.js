@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     loadBooks();
 
+    // handles adding a new book
     document.getElementById('book-form').addEventListener('submit', async function (e) {
         e.preventDefault();
         const title = document.getElementById('book-title').value;
         const author = document.getElementById('book-author').value;
         const genre = document.getElementById('book-genre').value;
 
+        // post request to add new book
         await axios.post('http://localhost:5000/books', {
             title,
             author,
@@ -19,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// loads all books
 async function loadBooks() {
     const res = await axios.get('http://localhost:5000/books');
     const books = res.data;
@@ -36,6 +39,7 @@ async function loadBooks() {
     });
 }
 
+// deletes a book
 async function deleteBook(id) {
     await axios.delete(`http://localhost:5000/books/${id}`);
     loadBooks();

@@ -80,7 +80,12 @@ def return_book_route():
 
 @app.route('/borrowings', methods=['GET']) #Shows all borrowing records
 def get_borrowings():
-    borrowings = get_all_borrowings()
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT id, bookid, customerid, borrowdate, returndate, late_fee FROM borrowingrecords")
+    borrowings = cursor.fetchall()
+    cursor.close()
+    connection.close()
     return jsonify(borrowings)
 
 if __name__ == '__main__':
